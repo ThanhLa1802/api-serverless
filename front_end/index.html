@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI File Analyzer</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #4c6ef5, #22b8cf);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 420px;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .upload-box {
+            border: 2px dashed #4c6ef5;
+            padding: 25px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            color: #4c6ef5;
+            font-weight: 600;
+            margin-bottom: 10px;
+            transition: 0.3s;
+            min-height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .upload-box:hover {
+            background: #f0f4ff;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-name {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #333;
+            height: 18px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            background: #4c6ef5;
+            color: white;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #3b5bdb;
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            color: #333;
+            text-align: left;
+            white-space: pre-line;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>AI File Analyzer</h2>
+        <p>Upload file & AI sẽ phân tích</p>
+
+        <label class="upload-box" for="fileInput" id="uploadLabel">
+            Chọn file để upload
+        </label>
+
+        <input type="file" id="fileInput" accept=".txt,.json" />
+
+        <div class="file-name" id="fileName"></div>
+
+        <button onclick="uploadFile()">Gửi lên AI</button>
+
+        <div class="result-box" id="resultBox"></div>
+    </div>
+
+    <script>
+        const API_URL = "https://xo8mcudd1k.execute-api.ap-southeast-1.amazonaws.com/test/analyze";
+
+        let selectedFile = null;
+
+        document.getElementById("fileInput").addEventListener("change", function (e) {
+            selectedFile = e.target.files[0];
+            document.getElementById("uploadLabel").innerText = "Đã chọn file";
+            document.getElementById("fileName").innerText = selectedFile.name;
+        });
+
+        async function uploadFile() {
+            if (!selectedFile) {
+                alert("Vui lòng chọn file trước.");
+                return;
+            }
+
+            const text = await selectedFile.text();
+
+            const payload = { data: text };
+
+            document.getElementById("resultBox").style.display = "block";
+            document.getElementById("resultBox").innerText = "Đang xử lý...";
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+
+                document.getElementById("resultBox").innerText =
+                    "📁 File ID: " + data.file_id + "\n\n"
+                    + "🧠 Summary:\n" + data.summary;
+
+            } catch (err) {
+                document.getElementById("resultBox").innerText = "❌ Lỗi: " + err.message;
+            }
+        }
+    </script>
+
+</body>
+
+</html>

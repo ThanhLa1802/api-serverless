@@ -26,7 +26,7 @@ def lambda_handler(event, context):
         "status": "processed",
         "summary": "This is a demo summary"
     })
-    
+    print(f"File {file_id} processed and stored.")
     return {
         "statusCode": 200,
         "body": json.dumps({"file_id": file_id, "summary": "Demo summary"})

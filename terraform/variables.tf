@@ -1,11 +1,8 @@
 variable "region" {
-  default = "east-southeast-1"
+  default = "ap-southeast-1"
 }
 
 variable "s3_bucket_name" {
-  default = "serverless-ai-${random_id.bucket_id.hex}"
+  default = "serverless-ai-uploads"
 }
 
-resource "random_id" "bucket_id" {
-  byte_length = 4
-}
