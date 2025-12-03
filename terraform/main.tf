@@ -140,6 +140,12 @@ resource "aws_apigatewayv2_route" "post_route" {
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
+resource "aws_apigatewayv2_route" "options_route" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "OPTIONS /analyze"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
+
 # -----------------------------
 # 🔥 FIX QUAN TRỌNG: Tạo Stage
 # -----------------------------

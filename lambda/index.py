@@ -29,5 +29,10 @@ def lambda_handler(event, context):
     print(f"File {file_id} processed and stored.")
     return {
         "statusCode": 200,
-        "body": json.dumps({"file_id": file_id, "summary": "Demo summary"})
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS"
+        },
+        "body": json.dumps({"message": "OK"})
     }
