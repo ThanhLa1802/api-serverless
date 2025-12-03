@@ -23,6 +23,18 @@ resource "aws_s3_bucket" "uploads" {
   }
 }
 
+resource "aws_s3_bucket_cors_configuration" "uploads_cors" {
+  bucket = aws_s3_bucket.uploads.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["PUT", "POST", "GET"]
+    allowed_origins = ["*"]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+}
+
 # -----------------------------
 # DYNAMODB TABLE
 # -----------------------------
@@ -98,7 +110,8 @@ resource "aws_lambda_function" "ai_demo" {
 
   filename         = "${path.module}/../lambda/deployment.zip"
   source_code_hash = filebase64sha256("${path.module}/../lambda/deployment.zip")
-
+  timeout      = 30 
+  memory_size  = 512
   environment {
     variables = {
       S3_BUCKET    = aws_s3_bucket.uploads.bucket
@@ -137,12 +150,6 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
 resource "aws_apigatewayv2_route" "post_route" {
   api_id    = aws_apigatewayv2_api.api.id
   route_key = "POST /analyze"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
-}
-
-resource "aws_apigatewayv2_route" "options_route" {
-  api_id    = aws_apigatewayv2_api.api.id
-  route_key = "OPTIONS /analyze"
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
